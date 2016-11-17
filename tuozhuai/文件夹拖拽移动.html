@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Document</title>
+<style type="text/css">
+body,p{
+	margin: 0;
+}
+body {
+	position: relative;
+}
+.wrap {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 80px;
+	height: 67px;
+	padding: 10px 0;
+	border: 1px solid #fff;
+	border-radius: 5px;
+	text-align: center;
+}
+.active {
+	border-color: #90C3FD;
+	background: #F1F5FA;
+}
+.opacity {
+	opacity: .5;
+	z-index: 100;
+}
+</style>
+<script type="text/javascript">
+window.onload = function() {
+	var wrap = document.querySelector('.wrap');
+	var body = document.body;
+	var isOut = true;
+	var isCreate = false;
+	
+	wrap.addEventListener('mousedown',doMove);
+	wrap.addEventListener('mouseover',function(){
+		if(this.className == "wrap") {
+			isOut = true;
+		}
+		if(isOut) {
+			this.className = "wrap active";
+		}
+	});
+	wrap.addEventListener('mouseout',function(){
+		if(isOut) {
+			this.className = "wrap";
+		}
+	});
+
+	function doMove(ev) {
+		isOut = false;
+		var _this = this;
+		if(!isCreate) {
+			isCreate = true;
+			var moveEle = this.cloneNode(true);
+			body.appendChild(moveEle);
+			this.className = "wrap opacity";
+		}
+		var rect = this.getBoundingClientRect();
+		var startX = ev.pageX - rect.left;
+		var startY = ev.pageY - rect.top;
+		document.addEventListener('mousedown',function(ev){
+			ev.preventDefault();
+			_this.className = 'wrap';
+		});
+		document.addEventListener('mousemove',doDrag);
+		function doDrag(ev) {
+			_this.className = "wrap opacity";
+			_this.style.left = ev.pageX - startX + "px";
+			_this.style.top = ev.pageY - startY + "px";
+		}
+		document.addEventListener('mouseup',doUp);
+		function doUp() {
+			isCreate = false;
+			body.removeChild(moveEle);
+			_this.className = "wrap active";
+			document.removeEventListener('mousemove',doDrag);
+			document.removeEventListener('mouseup',doUp);
+		}
+	}
+};
+</script>
+</head>
+<body>
+	<div class="wrap">
+		<img src="img/file.png">
+		<p>文件夹</p>
+	</div>
+</body>
+</html>
